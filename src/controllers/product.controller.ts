@@ -40,7 +40,7 @@ class ProductController extends Controller {
     product.description = req.body.description?.trim();
     product.price = parseInt(req.body.price);
     product.quantity = parseInt(req.body.quantity);
-    product.image = (req.files?.image as UploadedFile) ?? null;
+    product.imageFile = (req.files?.image as UploadedFile) ?? null;
     product.setCategoryId(req.body.category_id);
     product.setSellerId(req.session.app.user._id);
     const temp_product = product.toObjectLiteral();

@@ -1,17 +1,18 @@
 import { ObjectId } from "mongodb";
 import Model from "../core/model.js";
 import Category from "./category.model.js";
+import PipotDate from "../utils/date.js";
 
 export default class Product extends Model {
   static collectionName = "products";
 
-  public name?: string;
-  public slug?: string;
-  public description?: string;
-  public price?: number;
-  public quantity?: number;
-  public seller_id?: ObjectId | string | null;
-  public category_id?: ObjectId | string | null;
+  public name: string = "";
+  public slug: string = "";
+  public description?: string = "";
+  public price: number = NaN;
+  public quantity: number = NaN;
+  public seller_id: ObjectId | string | null = null;
+  public category_id: ObjectId | string | null = null;
 
   constructor() {
     super();
@@ -45,19 +46,36 @@ export default class Product extends Model {
     this.seller_id = new ObjectId(seller_id);
   }
 
-  private checkName = this.check(!this.name, "Veuillez donner un nom à l'article.");
-  private checkDescription = this.check(!this.description, "Veuillez décrire l'article.");
-  private checkPrice = this.check(
-    !Number.isInteger(this.price) || this.price! < 0,
-    "Le prix doit être un nombre entier supérieur ou égal à 0."
-  );
-  private checkQuantity = this.check(
-    !Number.isInteger(this.quantity) || this.quantity! < 1,
-    "La quantité doit être un nombre entier supérieur ou égal à 1.",
-  );
+  private checkName() {
+    return this.check(() => Boolean(this.name) === true, "Veuillez donner un nom à l'article.");
+  }
+
+  private checkDescription() {
+    return this.check(() => Boolean(this.description) === true, "Veuillez décrire l'article.");
+  }
+
+  private checkPrice() {
+    return this.check(
+      () => Number.isInteger(this.price) && this.price >= 0,
+      "Le prix doit être un nombre entier supérieur ou égal à 0."
+    );
+  }
+
+  private checkQuantity() {
+    return this.check(
+      () => Number.isInteger(this.quantity) && this.quantity >= 1,
+      "La quantité doit être un nombre entier supérieur ou égal à 1.",
+    );
+  }
+
   private async checkCategory(): Promise<string | null> {
-    const category = await Category.findOne({ _id: this.category_id });
-    return (!category) ? "Catégorie non trouvée." : null;
+    const message = "Catégorie non trouvée.";
+    try {
+      const category = await Category.findOne({ _id: this.category_id });
+      return (!category) ? message : null;
+    } catch (_e) {
+      return message;
+    }
   }
 
   public async getCreationErrors(): Promise<string[] | null> {
@@ -84,14 +102,7 @@ export default class Product extends Model {
       this.slug = slug;
       return;
     }
-    const date = new Date(),
-      year = date.getFullYear(),
-      month = date.getMonth() + 1,
-      day = date.getDate(),
-      hours = date.getHours(),
-      minutes = date.getMinutes(),
-      seconds = date.getSeconds();
-    this.slug = [slug, year, month, day, hours, minutes, seconds].join("-");
+    this.slug = `${this.slug}-${new PipotDate().getKebabDateTime()}`;
   }
 
   public async insert(): Promise<void> {

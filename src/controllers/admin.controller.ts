@@ -62,7 +62,7 @@ class AdminController extends Controller {
       return res.redirect("/admin/utilisateurs");
     }
 
-    user.username = req.body.username?.trim();
+    user.username = req.body.username;
     user.role = req.body.role;
     user.verified = "verified" in req.body;
     const errors = await user.getUpdateErrors(currentUsername);
@@ -93,16 +93,16 @@ class AdminController extends Controller {
 
   async addCategory_POST(req: Request, res: Response) {
     const category = new Category();
-    category.name = req.body.name?.trim();
-    category.description = req.body.description?.trim();
-    category.slug = req.body.slug?.trim();
+    category.name = req.body.name;
+    category.description = req.body.description;
+    category.slug = req.body.slug;
     if (req.files?.image)
-      category.image = req.files.image as UploadedFile;
+      category.imageFile = req.files.image as UploadedFile;
 
     const errors = await category.getCreationErrors();
     if (errors) {
       req.session.temp.category = category.toObjectLiteral();
-      req.flash("errors", errors as string[]);
+      req.flash("errors", errors);
       return res.redirect("/admin/categories/ajouter");
     }
     await category.insert();

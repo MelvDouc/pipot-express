@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { validate as isValidEmail } from "email-validator";
 import Model from "../core/model.js";
-import Randomizer from "../utils/Randomizer.js";
+import { getRandomString } from "../utils/random.js";
 
 export default class User extends Model {
   static collectionName = "users";
@@ -155,7 +155,7 @@ export default class User extends Model {
 
   public async register(): Promise<void> {
     await this.hashPlainPassword();
-    this.verif_string = Randomizer.generateVerifString(128);
+    this.verif_string = getRandomString(128);
     await Model.prototype.insert.call(this);
   }
 }

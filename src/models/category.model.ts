@@ -22,22 +22,20 @@ export default class Category extends Model {
     };
   }
 
-  hasNoName() {
-    return (!this.name) ? "Veuillez donner un nom à la catégorie." : null;
+  private checkName() {
+    return this.check(() => Boolean(this.name), "Veuillez donner un nom à la catégorie.");
   }
 
-  hasNoDescription() {
-    return (!this.description) ? "Veuillez décrire la catégorie." : null;
+  checkDescription() {
+    return this.check(() => Boolean(this.description), "Veuillez décrire la catégorie.");
   }
 
-  hasNoSlug() {
-    return (!this.slug) ? "Veuillez saisir un permalien." : null;
-  }
-
-  isSlugFormatInvalid() {
-    if (!this.slug || /^\w+(\-\w+)*$/.test(this.slug))
-      return null;
-    return "Format de permalien invalide.";
+  checkSlug() {
+    return this.check(() => {
+      return this.slug && /^[a-z0-9]+(\-[a-z0-9]+)*$/i.test(this.slug);
+    },
+      "Veuillez saisir un permalien ne contenant que des lettres et des chiffres optionellement reliés par des traits d'union."
+    );
   }
 
   async isNotUniqueSlug() {
@@ -49,18 +47,17 @@ export default class Category extends Model {
     return null;
   }
 
-  async getCreationErrors() {
+  public async getCreationErrors() {
     let errors = [];
-    errors.push(this.hasNoName());
-    errors.push(this.hasNoDescription());
-    errors.push(this.hasNoSlug());
-    errors.push(this.isSlugFormatInvalid());
+    errors.push(this.checkName());
+    errors.push(this.checkDescription());
+    errors.push(this.checkSlug());
     errors.push(await this.isNotUniqueSlug());
     errors.push(this.checkImageSize());
     errors.push(this.checkImageMimetype());
 
     errors = errors.filter(err => err !== null);
-    return errors.length ? errors : null;
+    return errors.length ? errors as string[] : null;
   }
 
   async findProducts() {

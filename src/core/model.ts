@@ -2,7 +2,7 @@ import { UploadedFile } from "express-fileupload";
 import { ObjectId } from "mongodb";
 import database from "./database.js";
 import { join as pathJoin } from "path";
-import uniqueFileName from "unique-filename";
+import { uniqueFileName } from "../utils/file-name.js";
 
 interface IModel {
   new(): Model;
@@ -41,11 +41,15 @@ export default abstract class Model {
     return entities.map(this.createFromEntity, this.prototype.constructor);
   }
 
-  public _id: ObjectId | null = null;
-  added_at: Date;
-  image?: UploadedFile | string | null;
+  public _id: ObjectId | null;
+  public added_at: Date;
+  public imageFile?: UploadedFile | null;
+  public image?: string | null;
 
   constructor() {
+    this._id = null;
+    this.imageFile = null;
+    this.image = null;
     this.added_at = new Date();
   }
 
@@ -54,47 +58,43 @@ export default abstract class Model {
   }
 
   protected get imageExtension() {
-    if (!this.image || typeof this.image === "string")
-      return null;
-    return this.image.name.match(/\.\w+$/g);
+    return this.imageFile?.name.match(/\.\w+$/g) ?? null;
   }
 
-  protected check(wrongCondition: boolean, message: string) {
-    return () => {
-      return (wrongCondition) ? message : null;
-    };
+  protected check(booleanFunction: Function, message: string) {
+    return (!booleanFunction()) ? message : null;
   }
 
   protected checkImageSize(): string | null {
-    if (!this.image || typeof this.image === "string")
+    if (!this.imageFile)
       return null;
 
-    if (this.image?.size > 2e6)
+    if (this.imageFile.size > 2e6)
       return "Fichier trop volumineux. 2 MB maximum.";
     return null;
   }
 
   protected checkImageMimetype(): string | null {
-    if (!this.image || typeof this.image === "string")
+    if (!this.imageFile)
       return null;
 
-    if (!Model.allowedMimetypes.includes(this.image.mimetype))
-      return "Seules les images au format jpg, png ou gif sont autorisées.";
+    if (!Model.allowedMimetypes.includes(this.imageFile.mimetype))
+      return "Seules les images au format jpg, jpeg, png ou gif sont autorisées.";
     return null;
   }
 
   protected saveImage(): void {
-    if (!this.image || typeof this.image === "string") {
+    if (!this.imageFile) {
       this.image = "default.jpg";
       return;
     }
 
     const imgFolder = pathJoin(process.cwd(), "static", "img", this.constr.collectionName);
-    const absolutePath = uniqueFileName(imgFolder) + this.imageExtension;
-    this.image.mv(absolutePath, (err) => {
+    const fileName = uniqueFileName(imgFolder) + this.imageExtension;
+    this.imageFile.mv(pathJoin(imgFolder, fileName), (err) => {
       if (err) throw err;
     });
-    this.image = absolutePath.split("\\").at(-1);
+    this.image = fileName;
   }
 
   public abstract toObjectLiteral(): { [key: string]: any; };
