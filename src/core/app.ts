@@ -6,8 +6,7 @@ import flash from "connect-flash";
 import fileUpload from "express-fileupload";
 import database from "./database.js";
 import router from "./router.js";
-import methodOverride from "../middleware/method-override.js";
-import setLocals from "../middleware/set-locals.js";
+import { methodOverride, setLocals, setSessionVars } from "../middleware/index.js";
 
 declare module 'express-session' {
   interface SessionData {
@@ -49,14 +48,10 @@ app.use(session({
   },
   store: database.store
 }));
-app.use((req, _res, next) => {
-  req.session.app ??= {};
-  req.session.temp ??= {};
-  next();
-});
 app.use(cookieParser());
 app.use(flash());
 app.use(methodOverride);
+app.use(setSessionVars);
 app.use(setLocals);
 app.use(router);
 
