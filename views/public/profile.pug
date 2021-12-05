@@ -1,0 +1,8 @@
+extends ./__base.pug
+
+block vars
+  - var title = `Profil de ${user.username}`
+
+block main
+  h2=title
+  a(href="/articles/ajouter") Ajouter un article

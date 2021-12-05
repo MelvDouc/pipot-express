@@ -1,0 +1,13 @@
+extends ../__base.pug
+
+block vars
+  - var title = "Catégories"
+
+block main
+  if categories && categories.length
+    each category in categories
+      div
+        h2
+          a(href=`/categories/${category.slug}`)= category.name
+  else
+    p Aucune catégorie à afficher.

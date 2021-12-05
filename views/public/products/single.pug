@@ -1,0 +1,9 @@
+extends ../__base.pug
+
+block vars
+  - var title = product.name
+
+block main
+  h2=product.name
+  p=product.description
+  img(src=`/img/products/${product.image}`)

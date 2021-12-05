@@ -1,0 +1,31 @@
+extends ../__base.pug
+
+block vars
+  - var title = "Ajouter un article"
+
+block main
+  form(method="POST" action="/articles/ajouter" enctype="multipart/form-data")
+    div.form-group
+      label(for="name") Nom
+      input(type="text" id="name" name="name" value=product.name required="")
+    div.form-group
+      label(for="description") Description
+      textarea(id="description" name="description" required="")=product.description
+    div.form-group
+      label(for="price") Prix
+      input(type="number" id="price" name="price" value=product.price required="")
+    div.form-group
+      label(for="quantity") Quantité
+      - var quantity = product.quantity ?? 1
+      input(type="number" id="quantity" name="quantity" value=quantity required="")
+    div.form-select
+      label(for="category_id") Catégorie
+      select(id="category_id" name="category_id")
+        each category in categories
+          - var is_selected = category._id === product.category_id
+          option(value=category._id selected=is_selected)=category.name
+    div.form-file
+      label(for="image") Image
+      input(type="file" id="image" name="image")
+    div.form-submit
+      button(type="submit") Ajouter

@@ -1,0 +1,7 @@
+extends ../__base.pug
+
+block main
+  each product in products
+    div
+      h3=product.name
+      a(href=`/articles/${product.slug}`) Voir

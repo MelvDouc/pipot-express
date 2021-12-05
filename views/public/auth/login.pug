@@ -1,0 +1,17 @@
+extends ../__base.pug
+
+block vars
+  - var title = "Connexion"
+
+block main
+  form(action="/connexion" method="POST")
+    div.form-group
+      label(for="uuid") Nom d'utilisateur ou adresse email
+      input(type="text" id="uuid" name="uuid" required="")
+    div.form-group
+      label(for="plain_password") Mot de passe
+      input(type="password" id="plain_password" name="plain_password" required="")
+    div.form-submit
+      button(type="submit") Se connecter
+    
+    p Pas encore de compte ? #[a(href="/inscription") S'inscrire]

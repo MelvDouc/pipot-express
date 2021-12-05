@@ -1,0 +1,27 @@
+extends ../__base.pug
+
+block vars
+  - var title = "Liste des utilisateurs"
+
+block main
+  table
+    thead
+      tr
+        th Nom d'utilisateur
+        th Adresse email
+        th Rôle
+        th Vérifié
+        th Date d'inscription
+        th Actions
+    tbody
+      for user in users
+        tr
+          td=user.username
+          td=user.email
+          td=user.role
+          - var verified = user.verified ? "Oui" : "Non"
+          td=verified
+          td=user.added_at.toLocaleString()
+          td
+            a(href=`/admin/utilisateurs/modifier/${user.username}`) Modifier
+            form(is="delete-user-form" data-user-id=user._id)

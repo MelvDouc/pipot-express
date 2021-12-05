@@ -1,0 +1,24 @@
+doctype html
+html(lang="fr")
+  head
+    block vars
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible" content="IE=edge")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    script(src="/js/main.js" type="module")
+    title #{title} — Espace Admin
+  body
+    header
+      nav
+        ul
+          li #[a(href="/admin/categories/ajouter") Ajouter une categorie]
+          li #[a(href="/admin/utilisateurs") Liste des utilisateurs]
+          li #[a(href="/") Accueil du site]
+          li #[a(href="/deconnexion") Déconnexion]
+    main
+      if flash_success
+        p=flash_success
+      if flash_errors
+        each error in flash_errors
+          p=error
+      block main

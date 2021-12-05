@@ -1,0 +1,21 @@
+extends ../__base.pug
+
+block vars
+  - var title = "Ajouter une catégorie"
+
+block main
+  form(method="POST" action="/admin/categories/ajouter" enctype="multipart/form-data")
+    div.form-group
+      label(for="name") Nom de la catégorie
+      input(type="text" id="name" name="name" value=category.name required="")
+    div.form-group
+      label(for="description") Description
+      textarea(id="description" name="description" required="")=category.description
+    div.form-group
+      label(for="slug") Permalien
+      input(type="text" id="slug" name="slug" value=category.slug required="")
+    div.form-file
+      label(for="image") Image
+      input(type="file" id="image" name="image")
+    div.form-submit
+      button(type="submit") Ajouter

@@ -1,0 +1,21 @@
+extends ../__base.pug
+
+block vars
+  - var title = `Modifier ${user.username}`
+
+block main
+  form(method="POST" action=`/admin/utilisateurs/modifier/${user.username}`)
+    div.form-group
+      label(for="username") Nom d'utilisateur
+      input(type="text" id="username" name="username" value=user.username required="")
+    div.form-select
+      label(for="role") Rôle
+      select(id="role" name="role" required="")
+        each role in roles
+          - var is_selected = user.role === role
+          option(value=role selected=is_selected)= role
+    div.form-checkbox
+      input(type="checkbox" id="verified" name="verified" checked=user.verified)
+      label(for="verified") Compte activé ?
+    div.form-submit
+      button(type="submit") Modifier

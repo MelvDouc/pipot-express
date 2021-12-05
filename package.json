@@ -1,0 +1,43 @@
+{
+  "name": "pipot",
+  "version": "1.0.0",
+  "description": "Site de troc en ligne",
+  "main": "dist/core/app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon dist/core/app.js",
+    "start": "node dist/core/app.js"
+  },
+  "keywords": [
+    "PIPOT",
+    "troc",
+    "en ligne"
+  ],
+  "author": "Melvin DOUCET",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/connect-flash": "^0.0.37",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.13",
+    "@types/express-fileupload": "^1.2.0",
+    "@types/express-session": "^1.17.4",
+    "@types/node": "^16.11.11",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "connect-mongo": "^4.6.0",
+    "cookie-parser": "^1.4.6",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-session": "^1.17.2",
+    "mongodb": "^4.2.1",
+    "nodemailer": "^6.7.2",
+    "pug": "^3.0.2",
+    "unique-filename": "^1.1.1"
+  }
+}
