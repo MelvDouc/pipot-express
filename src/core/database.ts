@@ -1,12 +1,19 @@
 import MongoStore from "connect-mongo";
-import { Db, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
+import {
+  DocumentInsertion,
+  DocumentModification,
+  DocumentOrNull,
+  Documents,
+  PipotDatabase
+} from "../types/db.js";
 
 class Database {
   private client: MongoClient;
-  private db: Db;
+  private db: PipotDatabase;
   public store: MongoStore;
 
-  async init() {
+  public async init(): Promise<void> {
     const url = process.env.MONGODB_URL as string;
     this.client = new MongoClient(url);
 
@@ -20,32 +27,32 @@ class Database {
     }
   }
 
-  async getOne(collectionName: string, filter: object) {
+  public async getOne(collectionName: string, filter: object): Promise<DocumentOrNull> {
     return await this.db
       .collection(collectionName)
       .findOne(filter);
   }
 
-  async getAll(collectionName: string, filter = {}) {
+  public async getAll(collectionName: string, filter = {}): Promise<Documents> {
     return await this.db
       .collection(collectionName)
       .find(filter)
       .toArray();
   }
 
-  async insert(collectionName: string, value: object) {
+  public async insert(collectionName: string, value: object): Promise<DocumentInsertion> {
     return await this.db
       .collection(collectionName)
       .insertOne(value);
   }
 
-  async update(collectionName: string, filter: object, update: object) {
+  async update(collectionName: string, filter: object, update: object): Promise<DocumentModification> {
     return await this.db
       .collection(collectionName)
       .findOneAndUpdate(filter, { $set: update });
   }
 
-  async delete(collectionName: string, _id: ObjectId) {
+  async delete(collectionName: string, _id: ObjectId): Promise<DocumentModification> {
     // returns null if no deletion, else returns document
     return await this.db
       .collection(collectionName)
