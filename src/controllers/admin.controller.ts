@@ -24,7 +24,7 @@ class AdminController extends Controller {
     const app_user = req.session.app.user;
 
     if (!app_user)
-      return res.redirect("/connexion");
+      return res.redirect("/auth/connexion");
 
     if (app_user.role !== User.roles.ADMIN) {
       req.flash("errors", ["Non autorisé."]);

@@ -1,4 +1,7 @@
+import csurf from "csurf";
 import { NextFunction, Request, Response } from "express";
+
+export const csrfProtection = csurf({ cookie: true });
 
 export function methodOverride(req: Request, _res: Response, next: NextFunction) {
   const allowedMethods = ["PUT", "PATCH", "DELETE"];

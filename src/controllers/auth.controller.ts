@@ -6,6 +6,7 @@ class AuthController extends Controller {
   constructor() {
     super();
     this.router.get("/deconnexion", this.logout);
+    this.router.use(this.csrfProtection);
     this.router.route("/connexion")
       .get(this.login_GET)
       .post(this.login_POST);
@@ -27,12 +28,13 @@ class AuthController extends Controller {
     const context = {
       user: req.session.temp.user ?? {},
       registered: Boolean(req.session.temp.registered),
-      email: req.session.temp.email ?? ""
+      email: req.session.temp.email ?? "",
+      csrf_token: req.csrfToken()
     };
     delete req.session.temp.user;
     delete req.session.temp.registered;
     delete req.session.temp.email;
-    return res.render("public/auth/register", context);
+    return res.render("auth/register", context);
   }
 
   async register_POST(req: Request, res: Response) {
@@ -47,18 +49,20 @@ class AuthController extends Controller {
 
     if (errors) {
       req.session.temp.user = { username: user.username, email: user.email };
-      return res.redirect("/inscription");
+      return res.redirect("/auth/inscription");
     }
 
     await user.register();
     req.session.temp.registered = true;
     req.session.temp.email = user.email;
-    return res.redirect("/inscription");
+    return res.redirect("/auth/inscription");
   }
 
   login_GET(req: Request, res: Response) {
     this.redirectToProfile(req, res);
-    return res.render("public/auth/login");
+    return res.render("auth/login", {
+      csrf_token: req.csrfToken()
+    });
   }
 
   async login_POST(req: Request, res: Response) {
@@ -74,14 +78,14 @@ class AuthController extends Controller {
 
     if (!user) {
       req.flash("errors", ["Identifiants incorrects."]);
-      return res.redirect("/connexion");
+      return res.redirect("/auth/connexion");
     }
 
     user.plain_password = plain_password;
     const isRightPassword = await (<User>user).checkPassword();
     if (!isRightPassword) {
       req.flash("errors", ["Identifiants incorrects."]);
-      return res.redirect("/connexion");
+      return res.redirect("/auth/connexion");
     }
 
     req.session.app.user = {

@@ -1,4 +1,4 @@
-extends ../__base.pug
+extends /__layouts/base.pug
 
 block vars
   - var title = "Inscription"
@@ -8,7 +8,8 @@ block main
     p Votre compte a bien été créé. Veuillez suivre le lien envoyé à #[strong=email] pour l'activer.
 
   else
-    form(method="POST" action="/inscription")
+    form(method="POST" action="/auth/inscription")
+      input(type="hidden" name="_csrf" value=csrf_token)
       div.form-group
         label(for="username") Nom d'utilisateur 
         input(type="text" id="username" name="username" value=user.username required="")
@@ -24,4 +25,4 @@ block main
       div.form-submit
         button(type="submit") S'inscrire
     
-    p Déjà un compte ? #[a(href="/connexion") Se connecter]
+    p Déjà un compte ? #[a(href="/auth/connexion") Se connecter]

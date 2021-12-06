@@ -1,4 +1,5 @@
-import { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
+import { csrfProtection } from "../middleware/index.js";
 
 export default abstract class Controller {
   protected router: Router;
@@ -30,5 +31,9 @@ export default abstract class Controller {
     for (const key in body)
       result[key] = body[key].trim();
     return result;
+  }
+
+  protected csrfProtection(req: Request, res: Response, next: NextFunction) {
+    return csrfProtection(req, res, next);
   }
 }

@@ -15,11 +15,11 @@ html(lang="en")
           li #[a(href="/categories") Catégories]
           if app.user
             li #[a(href=`/profil/${app.user.username}`)=app.user.username]
-            li #[a(href="/deconnexion") Déconnexion]
+            li #[a(href="/auth/deconnexion") Déconnexion]
             if app.user.role == "ADMIN"
               li #[a(href="/admin") Espace Admin]
           else
-            li #[a(href="/connexion") Connexion/Inscription]
+            li #[a(href="/auth/connexion") Connexion/Inscription]
 
     main
       if flash_success

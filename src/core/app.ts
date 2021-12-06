@@ -28,6 +28,7 @@ await database.init();
 
 app.set("trust proxy", 1);
 app.set("view engine", "pug");
+app.locals.basedir = pathJoin(rootDir, "views");
 
 app.use(express.static(staticPath));
 app.use(express.urlencoded({ extended: true }));

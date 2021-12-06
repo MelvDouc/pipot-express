@@ -18,12 +18,12 @@ class ProductController extends Controller {
     const product = await Product.findOne({ slug });
     if (!product)
       return res.redirect("/page-non-trouvee");
-    return res.render("public/products/single", { product });
+    return res.render("products/single", { product });
   }
 
   async add_GET(req: Request, res: Response) {
     if (!req.session.app.user)
-      return res.redirect("/connexion");
+      return res.redirect("/auth/connexion");
 
     const categories = await Category.findAll();
     const context = {
@@ -31,7 +31,7 @@ class ProductController extends Controller {
       categories
     };
     delete req.session.temp.product;
-    return res.render("public/products/add", context);
+    return res.render("products/add", context);
   }
 
   async add_POST(req: Request, res: Response) {

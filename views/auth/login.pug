@@ -1,10 +1,11 @@
-extends ../__base.pug
+extends /__layouts/base.pug
 
 block vars
   - var title = "Connexion"
 
 block main
-  form(action="/connexion" method="POST")
+  form(action="/auth/connexion" method="POST")
+    input(type="hidden" name="_csrf" value=csrf_token)
     div.form-group
       label(for="uuid") Nom d'utilisateur ou adresse email
       input(type="text" id="uuid" name="uuid" required="")
@@ -14,4 +15,4 @@ block main
     div.form-submit
       button(type="submit") Se connecter
     
-    p Pas encore de compte ? #[a(href="/inscription") S'inscrire]
+    p Pas encore de compte ? #[a(href="/auth/inscription") S'inscrire]
