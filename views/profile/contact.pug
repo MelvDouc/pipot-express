@@ -1,0 +1,10 @@
+extends /__layouts/base.pug
+
+block vars
+  - const title = `Contacter ${username}`
+
+block main
+  form(method="POST" action=`profil/${username}/contacter`)
+    form-text(id-plus="subject" label-text="Sujet" val=message.subject is-required="")
+    form-textarea(id-plus="body" label-text="Message" val=message.body is-required="")
+    form-submit(text="Envoyer")

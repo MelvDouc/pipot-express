@@ -1,6 +1,8 @@
 declare namespace Express {
+  import User from "./models/user.model.js";
+
   export interface Request {
-    username?: string;
+    profile_user?: User;
     is_own_profile?: boolean;
   }
 }

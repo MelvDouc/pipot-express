@@ -9,3 +9,5 @@ block main
   a(href=`/profil/${username}/articles`) Articles
   if is_own_profile
     a(href="/articles/ajouter") Ajouter un article
+  else
+    a(href=`/profil/${username}/contacter`) Contacter

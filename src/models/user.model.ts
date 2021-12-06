@@ -25,7 +25,7 @@ export default class User extends Model {
     this.role = User.roles.USER;
   }
 
-  toObjectLiteral() {
+  public toObjectLiteral() {
     return {
       _id: this._id,
       username: this.username,
@@ -36,6 +36,13 @@ export default class User extends Model {
       verif_string: this.verif_string,
       added_at: this.added_at,
     };
+  }
+
+  public deletePasswords(): User {
+    delete this.password;
+    delete this.plain_password;
+    delete this.confirm_password;
+    return this;
   }
 
   private async isUsernameTaken(): Promise<string | null> {
