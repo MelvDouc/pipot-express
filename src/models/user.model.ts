@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { validate as isValidEmail } from "email-validator";
 import Model from "../core/model.js";
 import { getRandomString } from "../utils/random.js";
+import Product from "./product.model.js";
 
 export default class User extends Model {
   static collectionName = "users";
@@ -43,19 +44,19 @@ export default class User extends Model {
     return null;
   }
 
-  private hasNoUsername(): string | null {
+  private checkUsername(): string | null {
     if (!this.username)
       return "Veuillez renseigner un nom d'utilisateur.";
     return null;
   }
 
-  private hasInvalidOuterCharacters(): string | null {
+  private checkUsernameOuterCharacters(): string | null {
     if (this.username && !/^[a-z0-9].+[a-z0-9]$/i.test(this.username))
       return "Le nom d'utilisateur doit commencer et terminer par une lettre ou un nombre.";
     return null;
   }
 
-  private hasInvalidInnerCharacters(): string | null {
+  private checkUsernameInnerCharacters(): string | null {
     if (this.username && /[^\w_\-]/.test(this.username))
       return "Le nom d'utilisateur ne doit contenir que des lettres, des chiffres et/ou des tirets.";
     return null;
@@ -66,47 +67,46 @@ export default class User extends Model {
     return (userWithSameEmail) ? "Un compte avec cette adresse email existe déjà." : null;
   }
 
-  isInvalidEmail() {
-    return (!isValidEmail(this.email!)) ? "Adresse email invalide" : null;
+  checkEmail() {
+    return this.check(() => isValidEmail(this.email!), "Adresse email invalide");
   }
 
   hasPlainPassword() {
-    return (!this.plain_password) ? "Veuillez renseigner un mot de passe." : null;
+    return this.check(() => Boolean(this.plain_password), "Veuillez renseigner un mot de passe.");
   }
 
   hasConfirmPassword() {
-    return (!this.confirm_password) ? "Veuillez confirmer le mot de passe." : null;
+    return this.check(() => Boolean(this.confirm_password), "Veuillez confirmer le mot de passe.");
   }
 
-  private passwordsDoNotMatch(): string | null {
-    if (this.plain_password && this.confirm_password && this.confirm_password !== this.plain_password)
-      return "Les mots de passe ne se correspondent pas.";
-    return null;
+  private checkPasswordsMatch(): string | null {
+    return this.check(() => {
+      return !this.plain_password || !this.confirm_password || this.plain_password === this.confirm_password;
+    }, "Les mots de passe ne se correspondent pas.");
   }
 
   private checkPasswordLength(): string | null {
-    if (this.plain_password!.length < 8 || this.plain_password!.length > 25)
-      return "Le mot de passe doit avoir une longueur entre 8 et 25 caractères.";
-    return null;
+    return this.check(() => {
+      const length = this.plain_password?.length ?? 0;
+      return length >= 8 && length <= 25;
+    }, "Le mot de passe doit avoir une longueur entre 8 et 25 caractères.");
   }
 
   isInvalidRole() {
-    if (!(this.role! in User.roles))
-      return "Rôle invalide.";
-    return null;
+    return this.check(() => this.role! in User.roles, "Rôle invalide");
   }
 
   public async getRegisterErrors(): Promise<string[] | null> {
     let errors = [];
-    errors.push(this.hasNoUsername());
+    errors.push(this.checkUsername());
     errors.push(await this.isUsernameTaken());
-    errors.push(this.hasInvalidOuterCharacters());
-    errors.push(this.hasInvalidInnerCharacters());
+    errors.push(this.checkUsernameOuterCharacters());
+    errors.push(this.checkUsernameInnerCharacters());
     errors.push(await this.isEmailTaken());
-    errors.push(this.isInvalidEmail());
+    errors.push(this.checkEmail());
     errors.push(this.hasPlainPassword());
     errors.push(this.hasConfirmPassword());
-    errors.push(this.passwordsDoNotMatch());
+    errors.push(this.checkPasswordsMatch());
     errors.push(this.checkPasswordLength());
 
     errors = errors.filter(err => err !== null);
@@ -117,9 +117,9 @@ export default class User extends Model {
     let errors: (string | null)[] = [];
     if (this.username !== oldUsername)
       errors.push(await this.isUsernameTaken());
-    errors.push(this.hasNoUsername());
-    errors.push(this.hasInvalidOuterCharacters());
-    errors.push(this.hasInvalidInnerCharacters());
+    errors.push(this.checkUsername());
+    errors.push(this.checkUsernameOuterCharacters());
+    errors.push(this.checkUsernameInnerCharacters());
     errors.push(this.isInvalidRole());
 
     errors = errors.filter(err => err !== null);
@@ -151,6 +151,11 @@ export default class User extends Model {
 
   public isAdmin(): boolean {
     return this.role === User.roles.ADMIN;
+  }
+
+  public async getProducts(): Promise<Product[] | null> {
+    const products = await Product.findAll({ seller_id: this._id });
+    return (products.length) ? products : null;
   }
 
   public async register(): Promise<void> {

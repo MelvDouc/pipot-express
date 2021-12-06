@@ -1,0 +1,12 @@
+extends /__layouts/base.pug
+
+block vars
+  - const title = `Articles de ${user.username}`
+
+block main
+  if products
+    each product in products
+      div
+        a(href=`/articles/${product.slug}`)=product.name
+  else
+    p Aucun article ajouté.

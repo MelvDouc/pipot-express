@@ -1,8 +1,11 @@
 extends /__layouts/base.pug
 
 block vars
-  - var title = `Profil de ${user.username}`
+  - const username = user.username
+  - const title = `Profil de ${username}`
 
 block main
   h2=title
-  a(href="/articles/ajouter") Ajouter un article
+  a(href=`/profil/${username}/articles`) Articles
+  if is_own_profile
+    a(href="/articles/ajouter") Ajouter un article

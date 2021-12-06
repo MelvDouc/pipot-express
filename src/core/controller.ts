@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { csrfProtection } from "../middleware/index.js";
+import { csrfProtection, sanitize } from "../middleware/index.js";
 
 export default abstract class Controller {
   protected router: Router;
@@ -15,22 +15,17 @@ export default abstract class Controller {
       this[methodName as keyof Controller] = method.bind(this);
     });
 
-    this.router.use((req, _res, next) => {
-      if (Object.keys(req.body).length)
-        req.body = this.sanitize(req.body);
-      next();
-    });
+    this.router.use(sanitize);
   }
 
   public getRouter() {
     return this.router;
   }
 
-  private sanitize(body: { [key: string]: string; }) {
-    const result: { [key: string]: string; } = {};
-    for (const key in body)
-      result[key] = body[key].trim();
-    return result;
+  protected redirectIfNotLoggedIn(req: Request, res: Response, next: NextFunction) {
+    if (!req.session.app.user)
+      return res.redirect("/auth/connexion");
+    next();
   }
 
   protected csrfProtection(req: Request, res: Response, next: NextFunction) {

@@ -4,12 +4,17 @@ import { Request, Response } from "express";
 class SiteController extends Controller {
   constructor() {
     super();
+    this.router.get("/a-propos", this.about);
     this.router.get("/page-non-trouvee", this.notFound);
     this.router.get(/^\/(accueil)?$/, this.home);
   }
 
   home(req: Request, res: Response) {
     return res.render("site/home");
+  }
+
+  about(req: Request, res: Response) {
+    return res.render("site/about");
   }
 
   notFound(req: Request, res: Response) {

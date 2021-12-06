@@ -7,12 +7,12 @@ import User from "../models/user.model.js";
 class AdminController extends Controller {
   constructor() {
     super();
-    this.router.use(this.redirectToLogin);
+    this.router.use(this.checkIfIsAdmin);
     this.router.route("/utilisateurs/modifier/:username")
       .get(this.updateUser_GET)
       .post(this.updateUser_POST);
     this.router.delete("/utilisateurs/supprimer/:id", this.deleteUser);
-    this.router.get("/utilisateurs", this.usersList);
+    this.router.get("/utilisateurs", this.allUsers);
     this.router.route("/categories/ajouter")
       .get(this.addCategory_GET)
       .post(this.addCategory_POST);
@@ -20,7 +20,7 @@ class AdminController extends Controller {
   }
 
   // middleware
-  redirectToLogin(req: Request, res: Response, next: NextFunction) {
+  checkIfIsAdmin(req: Request, res: Response, next: NextFunction) {
     const app_user = req.session.app.user;
 
     if (!app_user)
@@ -38,7 +38,7 @@ class AdminController extends Controller {
     return res.render("admin/home");
   }
 
-  async usersList(req: Request, res: Response) {
+  async allUsers(req: Request, res: Response) {
     const users = await User.findAll();
     return res.render("admin/users/all", { users });
   }
@@ -58,13 +58,13 @@ class AdminController extends Controller {
     const currentUsername = req.params.username;
     const user = await User.findOne({ username: currentUsername });
     if (!user) {
-      req.flash("errors", ["Pas d'utilisateur avec ce nom."]);
+      req.flash("errors", ["Aucun utilisateur trouvé avec ce nom."]);
       return res.redirect("/admin/utilisateurs");
     }
 
     user.username = req.body.username;
     user.role = req.body.role;
-    user.verified = "verified" in req.body;
+    user.verified = Boolean(req.body.verified);
     const errors = await user.getUpdateErrors(currentUsername);
 
     if (errors) {
@@ -107,7 +107,7 @@ class AdminController extends Controller {
     }
     await category.insert();
     req.flash("success", "La catégorie a bien été ajoutée.");
-    return res.redirect("/admin");
+    return res.redirect("/admin/categories");
   }
 }
 

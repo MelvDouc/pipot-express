@@ -21,31 +21,28 @@ export default router;
 
   ===== ALL ROUTES =====
 
-  /(accueil)?
-  /page-non-trouvee
-  /a-propos
+  /(accueil)? [x]
+  /page-non-trouvee [x]
+  /a-propos [x]
 
+  [x]
   /auth/inscription
   /auth/connexion
   /auth/deconnexion
 
+  [x]
   /categories
   /categories/:slug
 
-  /articles/:slug
+  [x]
   /articles/ajouter
+  /articles/:slug
 
-  /profil/:username
-  /profil/:username/articles
+  /profil/:username [x]
+  /profil/:username/articles [x]
   /profil/:username/contacter
 
-  /mon-profil
-  /mon-profil/articles
-  /mon-profil/articles/:slug/modifier
-  /mon-profil/articles/:slug/supprimer
-
   /admin/
-  /admin/connexion
   /admin/categories
   /admin/categories/:slug/ajouter
   /admin/categories/:slug/modifier

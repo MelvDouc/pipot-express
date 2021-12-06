@@ -16,7 +16,8 @@ block main
     tbody
       for user in users
         tr
-          td=user.username
+          td
+            a(href=`/profil/${user.username}`)=user.username
           td=user.email
           td=user.role
           - var verified = user.verified ? "Oui" : "Non"

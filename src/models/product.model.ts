@@ -33,17 +33,20 @@ export default class Product extends Model {
     };
   }
 
-  public setCategoryId(category_id: string): void {
+  public setCategoryId(category_id: string): Product {
     try {
       this.category_id = new ObjectId(category_id);
     } catch (error) {
       console.log(error);
       this.category_id = null;
+    } finally {
+      return this;
     }
   }
 
-  public setSellerId(seller_id: string): void {
+  public setSellerId(seller_id: string): Product {
     this.seller_id = new ObjectId(seller_id);
+    return this;
   }
 
   private checkName() {

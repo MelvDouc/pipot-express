@@ -8,8 +8,8 @@ class ProductController extends Controller {
   constructor() {
     super();
     this.router.route("/ajouter")
-      .get(this.add_GET)
-      .post(this.add_POST);
+      .get(this.redirectIfNotLoggedIn, this.add_GET)
+      .post(this.redirectIfNotLoggedIn, this.add_POST);
     this.router.get("/:slug", this.single);
   }
 
@@ -21,10 +21,7 @@ class ProductController extends Controller {
     return res.render("products/single", { product });
   }
 
-  async add_GET(req: Request, res: Response) {
-    if (!req.session.app.user)
-      return res.redirect("/auth/connexion");
-
+  async add_GET(req: Request, res: Response): Promise<void> {
     const categories = await Category.findAll();
     const context = {
       product: req.session.temp.product ?? {},
@@ -36,19 +33,19 @@ class ProductController extends Controller {
 
   async add_POST(req: Request, res: Response) {
     const product = new Product();
-    product.name = req.body.name?.trim();
-    product.description = req.body.description?.trim();
+    product.name = req.body.name;
+    product.description = req.body.description;
     product.price = parseInt(req.body.price);
     product.quantity = parseInt(req.body.quantity);
     product.imageFile = (req.files?.image as UploadedFile) ?? null;
-    product.setCategoryId(req.body.category_id);
-    product.setSellerId(req.session.app.user._id);
-    const temp_product = product.toObjectLiteral();
+    product
+      .setCategoryId(req.body.category_id)
+      .setSellerId(req.session.app.user._id);
     const errors = await product.getCreationErrors();
 
     if (errors) {
       req.flash("errors", errors);
-      req.session.temp.product = temp_product;
+      req.session.temp.product = product.toObjectLiteral();
       return res.redirect("/articles/ajouter");
     }
 

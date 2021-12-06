@@ -5,14 +5,11 @@ import Category from "../models/category.model.js";
 class CategoryController extends Controller {
   constructor() {
     super();
+    this.router.get("/:slug", this.single);
+    this.router.get("/", this.all);
   }
 
-  async allCategories(req: Request, res: Response) {
-    const categories = await Category.findAll();
-    return res.render("categories/all", { categories });
-  }
-
-  async singleCategory(req: Request, res: Response) {
+  async single(req: Request, res: Response) {
     const { slug } = req.params;
     const category = await Category.findOne({ slug });
 
@@ -25,6 +22,11 @@ class CategoryController extends Controller {
       title: `Catégorie ${category.name}`,
       products
     });
+  }
+
+  async all(req: Request, res: Response) {
+    const categories = await Category.findAll();
+    return res.render("categories/all", { categories });
   }
 }
 
