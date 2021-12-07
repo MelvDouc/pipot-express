@@ -104,6 +104,8 @@ class AuthController extends Controller {
   }
 
   logout(req: Request, res: Response) {
+    if (!req.session.app.user)
+      return res.redirect(req.header("Referer") ?? "/");
     req.session.app.user = null;
     req.flash("success", "Vous avez bien été déconnecté(e).");
     return res.redirect("/accueil");

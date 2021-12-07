@@ -1,7 +1,7 @@
+import { join as pathJoin } from "path";
 import { UploadedFile } from "express-fileupload";
 import { ObjectId } from "mongodb";
 import database from "./database.js";
-import { join as pathJoin } from "path";
 import { uniqueFileName } from "../utils/file-name.js";
 
 interface IModel {
@@ -22,7 +22,7 @@ export default abstract class Model {
   }
 
   static async findOne(filter: object) {
-    const entity = await database.getOne(this.collectionName, filter);
+    const entity = await database.findOne(this.collectionName, filter);
     if (!entity)
       return null;
     return this.createFromEntity(entity);
@@ -31,23 +31,23 @@ export default abstract class Model {
   static async findById(id: string) {
     try {
       return this.findOne({ _id: new ObjectId(id) });
-    } catch (error) {
+    } catch (_e) {
       return null;
     }
   }
 
   static async findAll(filter = {}) {
-    const entities = await database.getAll(this.collectionName, filter);
+    const entities = await database.findAll(this.collectionName, filter);
     return entities.map(this.createFromEntity, this.prototype.constructor);
   }
 
-  public _id: ObjectId | null;
-  public added_at: Date;
+  public _id: ObjectId;
+  public readonly added_at: Date;
   public imageFile?: UploadedFile | null;
   public image?: string | null;
 
   constructor() {
-    this._id = null;
+    this._id;
     this.imageFile = null;
     this.image = null;
     this.added_at = new Date();
@@ -99,22 +99,22 @@ export default abstract class Model {
 
   public abstract toObjectLiteral(): { [key: string]: any; };
 
-  public async insert(): Promise<void> {
-    await database.insert(this.constr.collectionName, this.toObjectLiteral());
+  public async insert() {
+    return await database.insert(this.constr.collectionName, this.toObjectLiteral());
   }
 
-  public async update(): Promise<void> {
-    await database.update(
+  public async update() {
+    return await database.update(
       this.constr.collectionName,
       { _id: this._id },
       this.toObjectLiteral()
     );
   }
 
-  public async delete(): Promise<void> {
+  public async delete() {
     if (!this._id)
       throw Error(`Object is missing an _id.`);
 
-    await database.delete(this.constr.collectionName, this._id);
+    return await database.delete(this.constr.collectionName, this._id);
   }
 }

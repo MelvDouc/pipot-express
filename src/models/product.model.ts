@@ -33,7 +33,7 @@ export default class Product extends Model {
     };
   }
 
-  public setCategoryId(category_id: string): Product {
+  public setCategoryId(category_id: ObjectId | string): Product {
     try {
       this.category_id = new ObjectId(category_id);
     } catch (error) {
@@ -44,8 +44,8 @@ export default class Product extends Model {
     }
   }
 
-  public setSellerId(seller_id: string): Product {
-    this.seller_id = new ObjectId(seller_id);
+  public setSellerId(seller_id: ObjectId): Product {
+    this.seller_id = seller_id;
     return this;
   }
 
@@ -108,9 +108,9 @@ export default class Product extends Model {
     this.slug = `${this.slug}-${new PipotDate().getKebabDateTime()}`;
   }
 
-  public async insert(): Promise<void> {
+  public async insert() {
     this.saveImage();
     await this.addSlug();
-    await Model.prototype.insert.call(this);
+    return await super.insert();
   }
 }

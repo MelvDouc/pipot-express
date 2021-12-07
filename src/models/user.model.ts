@@ -11,12 +11,12 @@ export default class User extends Model {
     USER: "USER"
   };
 
-  public username?: string;
-  public email?: string;
-  public password?: string;
-  public role?: string;
-  public verified?: string;
-  public verif_string?: string;
+  public username: string;
+  public email: string;
+  public password: string;
+  public role: string;
+  public verified: string;
+  public verif_string: string;
   public plain_password?: string | null;
   public confirm_password?: string | null;
 
@@ -39,7 +39,7 @@ export default class User extends Model {
   }
 
   public deletePasswords(): User {
-    delete this.password;
+    this.password = "";
     delete this.plain_password;
     delete this.confirm_password;
     return this;
@@ -52,21 +52,18 @@ export default class User extends Model {
   }
 
   private checkUsername(): string | null {
-    if (!this.username)
-      return "Veuillez renseigner un nom d'utilisateur.";
-    return null;
-  }
+    const check1 = this.check(() => Boolean(this.username), "Veuillez renseigner un nom d'utilisateur.");
+    if (check1) return check1;
 
-  private checkUsernameOuterCharacters(): string | null {
-    if (this.username && !/^[a-z0-9].+[a-z0-9]$/i.test(this.username))
-      return "Le nom d'utilisateur doit commencer et terminer par une lettre ou un nombre.";
-    return null;
-  }
+    const check2 = this.check(() => {
+      return /^[a-z0-9].+[a-z0-9]$/i.test(this.username);
+    }, "Le nom d'utilisateur doit commencer et terminer par une lettre ou un nombre.");
+    if (check2) return check2;
 
-  private checkUsernameInnerCharacters(): string | null {
-    if (this.username && /[^\w_\-]/.test(this.username))
-      return "Le nom d'utilisateur ne doit contenir que des lettres, des chiffres et/ou des tirets.";
-    return null;
+    const check3 = this.check(() => {
+      return !/[^\w_\-]/.test(this.username);
+    }, "Le nom d'utilisateur ne doit contenir que des lettres, des chiffres et/ou des tirets.");
+    return check3;
   }
 
   async isEmailTaken() {
@@ -107,8 +104,6 @@ export default class User extends Model {
     let errors = [];
     errors.push(this.checkUsername());
     errors.push(await this.isUsernameTaken());
-    errors.push(this.checkUsernameOuterCharacters());
-    errors.push(this.checkUsernameInnerCharacters());
     errors.push(await this.isEmailTaken());
     errors.push(this.checkEmail());
     errors.push(this.hasPlainPassword());
@@ -125,8 +120,6 @@ export default class User extends Model {
     if (this.username !== oldUsername)
       errors.push(await this.isUsernameTaken());
     errors.push(this.checkUsername());
-    errors.push(this.checkUsernameOuterCharacters());
-    errors.push(this.checkUsernameInnerCharacters());
     errors.push(this.isInvalidRole());
 
     errors = errors.filter(err => err !== null);
@@ -165,9 +158,9 @@ export default class User extends Model {
     return (products.length) ? products : null;
   }
 
-  public async register(): Promise<void> {
+  public async register() {
     await this.hashPlainPassword();
     this.verif_string = getRandomString(128);
-    await Model.prototype.insert.call(this);
+    return await super.insert();
   }
 }

@@ -6,7 +6,7 @@ class SiteController extends Controller {
     super();
     this.router.get("/a-propos", this.about);
     this.router.get("/page-non-trouvee", this.notFound);
-    this.router.get(/^\/(accueil)?$/, this.home);
+    this.router.get(/\/(accueil)?/, this.home);
   }
 
   home(req: Request, res: Response) {

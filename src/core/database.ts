@@ -27,13 +27,13 @@ class Database {
     }
   }
 
-  public async getOne(collectionName: string, filter: object): Promise<DocumentOrNull> {
+  public async findOne(collectionName: string, filter: object): Promise<DocumentOrNull> {
     return await this.db
       .collection(collectionName)
       .findOne(filter);
   }
 
-  public async getAll(collectionName: string, filter = {}): Promise<Documents> {
+  public async findAll(collectionName: string, filter = {}): Promise<Documents> {
     return await this.db
       .collection(collectionName)
       .find(filter)

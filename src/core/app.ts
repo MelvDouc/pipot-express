@@ -23,14 +23,14 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 const port = process.env.PORT || 5000;
 const rootDir = process.cwd();
-const staticPath = pathJoin(rootDir, "static");
 await database.init();
 
 app.set("trust proxy", 1);
 app.set("view engine", "pug");
+app.set("strict routing", false);
 app.locals.basedir = pathJoin(rootDir, "views");
 
-app.use(express.static(staticPath));
+app.use(express.static(pathJoin(rootDir, "static")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileUpload({
@@ -39,6 +39,7 @@ app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: pathJoin(rootDir, "tmp")
 }));
+app.use(cookieParser());
 app.use(session({
   secret: <string>process.env.SESSION_SECRET,
   resave: true,
@@ -49,7 +50,6 @@ app.use(session({
   },
   store: database.store
 }));
-app.use(cookieParser());
 app.use(flash());
 app.use(methodOverride);
 app.use(setSessionVars);
@@ -57,5 +57,6 @@ app.use(setLocals);
 app.use(router);
 
 app.listen(port, () => {
-  console.log(`App running on http://localhost:${port}...`);
+  if (app.get("env") === "development")
+    console.log(`App running on http://localhost:${port}...`);
 });

@@ -66,6 +66,6 @@ export default class Category extends Model {
 
   async insert() {
     this.saveImage();
-    await Model.prototype.insert.call(this);
+    return await super.insert();
   }
 }

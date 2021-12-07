@@ -79,7 +79,10 @@ class AdminController extends Controller {
   async deleteUser(req: Request, res: Response) {
     const { id } = req.params;
     const user = await User.findById(id);
-    await user.delete();
+    if (user)
+      await user.delete();
+    else
+      req.flash("errors", ["Aucun utilisateur trouvé."]);
     return res.redirect("/admin/utilisateurs");
   }
 
