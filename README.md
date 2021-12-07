@@ -4,7 +4,7 @@
 - [ ] csfr token
 - [ ] categories CRUD
 - [ ] products CRUD
-- [ ] searching
+- [x] searching
 - [ ] send verif emails
 - [ ] about page
 - [ ] styling

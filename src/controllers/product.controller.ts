@@ -10,6 +10,7 @@ class ProductController extends Controller {
     this.router.route("/ajouter")
       .get(this.redirectIfNotLoggedIn, this.add_GET)
       .post(this.redirectIfNotLoggedIn, this.add_POST);
+    this.router.get("/rechercher", this.search);
     this.router.get("/:slug", this.single);
   }
 
@@ -51,6 +52,24 @@ class ProductController extends Controller {
 
     await product.insert();
     return res.redirect(`/articles/${product.slug}`);
+  }
+
+  async search(req: Request, res: Response) {
+    const search = (<string>req.query.q ?? "").trim().toLowerCase();
+    const $regex = search.replace(/\s+/g, "|");
+    const detail = {
+      $regex,
+      $options: "i"
+    };
+    const products = await Product.findAll({
+      $or: [
+        { name: detail },
+        { description: detail }
+      ]
+    });
+    return res.render("products/search", {
+      products: (products.length) ? products : null
+    });
   }
 }
 

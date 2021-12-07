@@ -21,6 +21,10 @@ html(lang="en")
               li #[a(href="/admin") Espace Admin]
           else
             li #[a(href="/auth/connexion") Connexion/Inscription]
+      div(id="search-bar")
+        form(action="/articles/rechercher" method="GET")
+          input(type="text" name="q" required="" placeholder="Recherchez un article...")
+          input(type="submit" value="Rechercher")
 
     main
       if flash_success
