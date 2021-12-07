@@ -6,5 +6,6 @@
 - [ ] products CRUD
 - [x] searching
 - [ ] send verif emails
+- [ ] update activate link (User model)
 - [ ] about page
 - [ ] styling

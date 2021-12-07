@@ -72,7 +72,11 @@ class AdminController extends Controller {
       return res.redirect(`/admin/utilisateurs/modifier/${currentUsername}`);
     }
 
-    await user.update();
+    await user.update({
+      username: user.username,
+      role: user.role,
+      verified: user.verified
+    });
     return res.redirect("/admin/utilisateurs");
   }
 

@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { validate as isValidEmail } from "email-validator";
 import Model from "../core/model.js";
+import sendEmail from "../utils/email.js";
 import { getRandomString } from "../utils/random.js";
 import Product from "./product.model.js";
 
@@ -15,7 +16,7 @@ export default class User extends Model {
   public email: string;
   public password: string;
   public role: string;
-  public verified: string;
+  public verified: boolean;
   public verif_string: string;
   public plain_password?: string | null;
   public confirm_password?: string | null;
@@ -158,9 +159,32 @@ export default class User extends Model {
     return (products.length) ? products : null;
   }
 
+  private async sendActivationLink() {
+    const notification = await sendEmail({
+      to: this.email,
+      subject: "Inscription sur PIPOT",
+      html: `<h1>Bonjour <b>${this.username}</b>,</h1>
+      <p>Votre inscription a bien été enregistrée. Veuillez suivre <a href="http://localhost:5000/activation?verif_string=${this.verif_string}">ce lien</a> pour activer votre compte.</p>
+      <p style="margin-top: 2em;">Bon troc,<br />L'équipe PIPOT</p>`
+    });
+    if (!notification)
+      throw new Error(`${this.username} couldn't be notified.`);
+    return;
+  }
+
   public async register() {
     await this.hashPlainPassword();
     this.verif_string = getRandomString(128);
+    await this.sendActivationLink();
     return await super.insert();
+  }
+
+  public async verify() {
+    this.verified = true;
+    this.verif_string = "";
+    return await this.update({
+      verified: this.verified,
+      verif_string: this.verif_string
+    });
   }
 }

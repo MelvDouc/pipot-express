@@ -52,10 +52,15 @@ class AuthController extends Controller {
       return res.redirect("/auth/inscription");
     }
 
-    await user.register();
-    req.session.temp.registered = true;
-    req.session.temp.email = user.email;
-    return res.redirect("/auth/inscription");
+    try {
+      await user.register();
+      req.session.temp.registered = true;
+      req.session.temp.email = user.email;
+    } catch (_e) {
+      req.flash("errors", ["Une erreur s'est produite. Veuillez réessayer."]);
+    } finally {
+      return res.redirect("/auth/inscription");
+    }
   }
 
   login_GET(req: Request, res: Response) {

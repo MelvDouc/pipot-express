@@ -103,11 +103,11 @@ export default abstract class Model {
     return await database.insert(this.constr.collectionName, this.toObjectLiteral());
   }
 
-  public async update() {
+  public async update(updates = {}) {
     return await database.update(
       this.constr.collectionName,
       { _id: this._id },
-      this.toObjectLiteral()
+      updates
     );
   }
 
