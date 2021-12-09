@@ -1,8 +1,19 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Controller from "../core/controller.js";
 import User from "../models/user.model.js";
+import { Middleware, Controller as controller, Get as get } from "@decorators/express";
+import { Injectable } from "@decorators/di";
+import { csrfProtection } from "../middleware/index.js";
 
-class AuthController extends Controller {
+class AuthMiddleware implements Middleware {
+  use(req: Request, res: Response, next: NextFunction) {
+    csrfProtection(req, res, next);
+  }
+}
+
+@controller("/auth")
+@Injectable()
+export default class AuthController extends Controller {
   constructor() {
     super();
     this.router.get("/deconnexion", this.logout);
@@ -23,8 +34,9 @@ class AuthController extends Controller {
     return res.redirect(`/profil/${req.session.app.user.username}`);
   }
 
+  @get("/inscription", [AuthMiddleware])
   register_GET(req: Request, res: Response) {
-    this.redirectToProfile(req, res);
+    // this.redirectToProfile(req, res);
     const context = {
       user: req.session.temp.user ?? {},
       registered: Boolean(req.session.temp.registered),
@@ -116,6 +128,3 @@ class AuthController extends Controller {
     return res.redirect("/accueil");
   }
 }
-
-const authController = new AuthController();
-export default authController;

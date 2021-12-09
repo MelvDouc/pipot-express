@@ -1,16 +1,21 @@
 import Controller from "../core/controller.js";
 import { Request, Response } from "express";
 import User from "../models/user.model.js";
+import { Controller as controller, Get as get } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 
-class SiteController extends Controller {
+@controller("/")
+@Injectable()
+export class SiteController extends Controller {
   constructor() {
     super();
-    this.router.get("/a-propos", this.about);
-    this.router.get("/page-non-trouvee", this.notFound);
-    this.router.get("/activation", this.accountActivation);
-    this.router.get(/\/(accueil)?/, this.home);
+    // this.router.get("/a-propos", this.about);
+    // this.router.get("/page-non-trouvee", this.notFound);
+    // this.router.get("/activation", this.accountActivation);
+    // this.router.get(/\/(accueil)?/, this.home);
   }
 
+  @get("/")
   home(req: Request, res: Response) {
     return res.render("site/home");
   }
