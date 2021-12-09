@@ -1,48 +1,31 @@
 import { UploadedFile } from "express-fileupload";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import { Controller as controller, Get as get, Post as post } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 import Controller from "../core/controller.js";
 import Category from "../models/category.model.js";
 import User from "../models/user.model.js";
+import AdminMiddleware from "../middleware/admin.middleware.js";
 
-class AdminController extends Controller {
+@controller("/admin", [AdminMiddleware])
+@Injectable()
+export default class AdminController extends Controller {
   constructor() {
     super();
-    this.router.use(this.checkIfIsAdmin);
-    this.router.route("/utilisateurs/modifier/:username")
-      .get(this.updateUser_GET)
-      .post(this.updateUser_POST);
-    this.router.delete("/utilisateurs/supprimer/:id", this.deleteUser);
-    this.router.get("/utilisateurs", this.allUsers);
-    this.router.route("/categories/ajouter")
-      .get(this.addCategory_GET)
-      .post(this.addCategory_POST);
-    this.router.get(/^\/(accueil)?$/, this.home);
   }
 
-  // middleware
-  checkIfIsAdmin(req: Request, res: Response, next: NextFunction) {
-    const app_user = req.session.app.user;
-
-    if (!app_user)
-      return res.redirect("/auth/connexion");
-
-    if (app_user.role !== User.roles.ADMIN) {
-      req.flash("errors", ["Non autorisé."]);
-      return res.redirect("/");
-    }
-
-    next();
-  }
-
+  @get("/")
   home(req: Request, res: Response) {
     return res.render("admin/home");
   }
 
+  @get("/utilisateurs")
   async allUsers(req: Request, res: Response) {
     const users = await User.findAll();
     return res.render("admin/users/all", { users });
   }
 
+  @get("utilisateurs/modifier/:username")
   async updateUser_GET(req: Request, res: Response) {
     const { username } = req.params;
     const user = await User.findOne({ username });
@@ -54,6 +37,7 @@ class AdminController extends Controller {
     return res.render("admin/users/update", { user, roles });
   }
 
+  @post("utilisateurs/modifier/:username")
   async updateUser_POST(req: Request, res: Response) {
     const currentUsername = req.params.username;
     const user = await User.findOne({ username: currentUsername });
@@ -80,6 +64,7 @@ class AdminController extends Controller {
     return res.redirect("/admin/utilisateurs");
   }
 
+  @get("/utilisateurs/supprimer/:id")
   async deleteUser(req: Request, res: Response) {
     const { id } = req.params;
     const user = await User.findById(id);
@@ -90,6 +75,7 @@ class AdminController extends Controller {
     return res.redirect("/admin/utilisateurs");
   }
 
+  @get("/categories/ajouter")
   addCategory_GET(req: Request, res: Response) {
     const context = {
       category: req.session.temp.category ?? {}
@@ -98,6 +84,7 @@ class AdminController extends Controller {
     return res.render("admin/categories/add", context);
   }
 
+  @post("/categories/ajouter")
   async addCategory_POST(req: Request, res: Response) {
     const category = new Category();
     category.name = req.body.name;
@@ -117,6 +104,3 @@ class AdminController extends Controller {
     return res.redirect("/admin/categories");
   }
 }
-
-const adminController = new AdminController();
-export default adminController;

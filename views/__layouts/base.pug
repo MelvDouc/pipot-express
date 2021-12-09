@@ -12,7 +12,7 @@ html(lang="en")
     header
       nav
         ul
-          li #[a(href="/accueil") Accueil]
+          li #[a(href="/") Accueil]
           li #[a(href="/categories") Catégories]
           if app.user
             li #[a(href=`/profil/${app.user.username}`)=app.user.username]

@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
+import { Controller as controller, Get as get } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 import Controller from "../core/controller.js";
 import Category from "../models/category.model.js";
 
-class CategoryController extends Controller {
+@controller("/categories")
+@Injectable()
+export default class CategoryController extends Controller {
   constructor() {
     super();
-    this.router.get("/:slug", this.single);
-    this.router.get("/", this.all);
   }
 
+  @get("/:slug")
   async single(req: Request, res: Response) {
     const { slug } = req.params;
     const category = await Category.findOne({ slug });
@@ -24,11 +27,9 @@ class CategoryController extends Controller {
     });
   }
 
+  @get("/")
   async all(req: Request, res: Response) {
     const categories = await Category.findAll();
     return res.render("categories/all", { categories });
   }
 }
-
-const categoryController = new CategoryController();
-export default categoryController;

@@ -1,29 +1,15 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import { Controller as controller, Get as get, Post as post } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 import Controller from "../core/controller.js";
 import User from "../models/user.model.js";
-import { Middleware, Controller as controller, Get as get } from "@decorators/express";
-import { Injectable } from "@decorators/di";
-import { csrfProtection } from "../middleware/index.js";
-
-class AuthMiddleware implements Middleware {
-  use(req: Request, res: Response, next: NextFunction) {
-    csrfProtection(req, res, next);
-  }
-}
+import AuthMiddleware from "../middleware/auth.middleware.js";
 
 @controller("/auth")
 @Injectable()
 export default class AuthController extends Controller {
   constructor() {
     super();
-    this.router.get("/deconnexion", this.logout);
-    this.router.use(this.csrfProtection);
-    this.router.route("/connexion")
-      .get(this.login_GET)
-      .post(this.login_POST);
-    this.router.route("/inscription")
-      .get(this.register_GET)
-      .post(this.register_POST);
   }
 
   // Middleware (not working with router.use())
@@ -36,7 +22,6 @@ export default class AuthController extends Controller {
 
   @get("/inscription", [AuthMiddleware])
   register_GET(req: Request, res: Response) {
-    // this.redirectToProfile(req, res);
     const context = {
       user: req.session.temp.user ?? {},
       registered: Boolean(req.session.temp.registered),
@@ -49,9 +34,8 @@ export default class AuthController extends Controller {
     return res.render("auth/register", context);
   }
 
+  @post("/inscription", [AuthMiddleware])
   async register_POST(req: Request, res: Response) {
-    this.redirectToProfile(req, res);
-
     const user = new User();
     user.username = req.body.username?.trim();
     user.email = req.body.email?.trim();
@@ -75,16 +59,15 @@ export default class AuthController extends Controller {
     }
   }
 
+  @get("/connexion", [AuthMiddleware])
   login_GET(req: Request, res: Response) {
-    this.redirectToProfile(req, res);
     return res.render("auth/login", {
       csrf_token: req.csrfToken()
     });
   }
 
+  @post("/connexion", [AuthMiddleware])
   async login_POST(req: Request, res: Response) {
-    this.redirectToProfile(req, res);
-
     const { uuid, plain_password } = req.body;
     const user: User | null = await User.findOne({
       $or: [
@@ -113,18 +96,18 @@ export default class AuthController extends Controller {
       verified: user.verified,
       added_at: user.added_at
     };
-    // console.log(req.session.user);
     req.flash("success", "Connection réussie.");
     if (user.isAdmin())
       return res.redirect("/admin");
     return res.redirect(`/profil/${user.username}`);
   }
 
+  @get("/deconnexion")
   logout(req: Request, res: Response) {
     if (!req.session.app.user)
       return res.redirect(req.header("Referer") ?? "/");
     req.session.app.user = null;
     req.flash("success", "Vous avez bien été déconnecté(e).");
-    return res.redirect("/accueil");
+    return res.redirect("/");
   }
 }

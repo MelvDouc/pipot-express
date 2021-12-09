@@ -1,25 +1,18 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import { Controller as controller, Get as get } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 import Controller from "../core/controller.js";
 import User from "../models/user.model.js";
+import ProfileMiddleware from "../middleware/profile.middleware.js";
 
-export class ProfileController extends Controller {
+@controller("/profil/:username", [ProfileMiddleware])
+@Injectable()
+export default class ProfileController extends Controller {
   constructor() {
     super();
-    this.router.param("username", this.getUser)
-      .get("/:username/articles", this.products)
-      .get("/:username/contacter", this.redirectIfNotLoggedIn, this.contact_GET)
-      .get("/:username", this.index);
   }
 
-  async getUser(req: Request, res: Response, next: NextFunction, username: string) {
-    const user = await User.findOne({ username });
-    if (!user)
-      return res.redirect("/page-non-trouvee");
-    res.locals.user = user.deletePasswords() as User;
-    res.locals.is_own_profile = user.username === req.session.app.user?.username;
-    next();
-  }
-
+  @get("/")
   index(req: Request, res: Response) {
     const user = res.locals.user as User;
     return res.render("profile/index", {
@@ -28,6 +21,7 @@ export class ProfileController extends Controller {
     });
   }
 
+  @get("/articles")
   async products(req: Request, res: Response) {
     const user = res.locals.user as User;
     const products = await user.getProducts();
@@ -38,7 +32,11 @@ export class ProfileController extends Controller {
     });
   }
 
+  @get("/contacter")
   contact_GET(req: Request, res: Response) {
+    if (!req.session.app.user)
+      return res.redirect("/auth/connexion");
+
     const appUser = req.session.app.user as User;
     const profileUser = res.locals.user as User;
 
@@ -51,6 +49,3 @@ export class ProfileController extends Controller {
     });
   }
 }
-
-const profileController = new ProfileController();
-export default profileController;

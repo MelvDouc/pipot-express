@@ -1,21 +1,22 @@
-import { attachControllers } from "@decorators/express";
 import { Router } from "express";
-import adminController from "../controllers/admin.controller.js";
+import { attachControllers } from "@decorators/express";
+import AdminController from "../controllers/admin.controller.js";
 import AuthController from "../controllers/auth.controller.js";
-import categoryController from "../controllers/category.controller.js";
-import productController from "../controllers/product.controller.js";
-import profileController from "../controllers/profile.controller.js";
-import siteController, { SiteController } from "../controllers/site.controller.js";
+import CategoryController from "../controllers/category.controller.js";
+import ProductController from "../controllers/product.controller.js";
+import ProfileController from "../controllers/profile.controller.js";
+import SiteController from "../controllers/site.controller.js";
 
 const router = Router();
 
-router.use("/admin", adminController.getRouter());
-router.use("/articles", productController.getRouter());
-router.use("/categories", categoryController.getRouter());
-router.use("/profil", profileController.getRouter());
-// router.use("/auth", authController.getRouter());
-// router.use("/", siteController.getRouter());
-attachControllers(router, [SiteController, AuthController]);
+attachControllers(router, [
+  AdminController,
+  AuthController,
+  CategoryController,
+  ProfileController,
+  ProductController,
+  SiteController
+]);
 
 export default router;
 
@@ -23,7 +24,7 @@ export default router;
 
   ===== ALL ROUTES =====
 
-  /(accueil)? [x]
+  / [x]
   /page-non-trouvee [x]
   /a-propos [x]
 

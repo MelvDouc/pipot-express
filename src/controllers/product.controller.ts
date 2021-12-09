@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
+import { Controller as controller, Get as get, Post as post } from "@decorators/express";
+import { Injectable } from "@decorators/di";
 import Controller from "../core/controller.js";
 import Category from "../models/category.model.js";
 import Product from "../models/product.model.js";
 
-class ProductController extends Controller {
+@controller("/articles")
+@Injectable()
+export default class ProductController extends Controller {
   constructor() {
     super();
-    this.router.route("/ajouter")
-      .get(this.redirectIfNotLoggedIn, this.add_GET)
-      .post(this.redirectIfNotLoggedIn, this.add_POST);
-    this.router.get("/rechercher", this.search);
-    this.router.get("/:slug", this.single);
   }
 
+  @get("/:slug")
   async single(req: Request, res: Response) {
     const { slug } = req.params;
     const product = await Product.findOne({ slug });
@@ -22,6 +22,7 @@ class ProductController extends Controller {
     return res.render("products/single", { product });
   }
 
+  @get("/ajouter")
   async add_GET(req: Request, res: Response): Promise<void> {
     const categories = await Category.findAll();
     const context = {
@@ -32,6 +33,7 @@ class ProductController extends Controller {
     return res.render("products/add", context);
   }
 
+  @post("/ajouter")
   async add_POST(req: Request, res: Response) {
     const product = new Product();
     product.name = req.body.name;
@@ -54,6 +56,7 @@ class ProductController extends Controller {
     return res.redirect(`/articles/${product.slug}`);
   }
 
+  @get("/rechercher")
   async search(req: Request, res: Response) {
     const search = (<string>req.query.q ?? "").trim().toLowerCase();
     const $regex = search.replace(/\s+/g, "|");
@@ -72,6 +75,3 @@ class ProductController extends Controller {
     });
   }
 }
-
-const productController = new ProductController();
-export default productController;

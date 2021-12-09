@@ -1,7 +1,4 @@
-import csurf from "csurf";
 import { NextFunction, Request, Response } from "express";
-
-export const csrfProtection = csurf({ cookie: true });
 
 export function methodOverride(req: Request, _res: Response, next: NextFunction) {
   const allowedMethods = ["PUT", "PATCH", "DELETE"];
@@ -23,15 +20,5 @@ export function setLocals(req: Request, res: Response, next: NextFunction) {
 export function setSessionVars(req: Request, _res: Response, next: NextFunction) {
   req.session.app ??= {};
   req.session.temp ??= {};
-  next();
-}
-
-export function sanitize(req: Request, _res: Response, next: NextFunction) {
-  for (const key in req.body) {
-    const value = req.body[key];
-    if (typeof value !== "string")
-      continue;
-    req.body[key] = value.trim().replace(/(<|>)/g, "\\$1");
-  }
   next();
 }
