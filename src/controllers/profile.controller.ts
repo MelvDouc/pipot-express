@@ -5,14 +5,14 @@ import Controller from "../core/controller.js";
 import User from "../models/user.model.js";
 import ProfileMiddleware from "../middleware/profile.middleware.js";
 
-@controller("/profil/:username", [ProfileMiddleware])
+@controller("/profil")
 @Injectable()
 export default class ProfileController extends Controller {
   constructor() {
     super();
   }
 
-  @get("/")
+  @get("/:username", [ProfileMiddleware])
   index(req: Request, res: Response) {
     const user = res.locals.user as User;
     return res.render("profile/index", {
@@ -21,7 +21,7 @@ export default class ProfileController extends Controller {
     });
   }
 
-  @get("/articles")
+  @get("/:username/articles", [ProfileMiddleware])
   async products(req: Request, res: Response) {
     const user = res.locals.user as User;
     const products = await user.getProducts();
@@ -32,7 +32,7 @@ export default class ProfileController extends Controller {
     });
   }
 
-  @get("/contacter")
+  @get("/:username/contacter", [ProfileMiddleware])
   contact_GET(req: Request, res: Response) {
     if (!req.session.app.user)
       return res.redirect("/auth/connexion");

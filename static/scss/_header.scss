@@ -1,0 +1,33 @@
+header {
+  font-size: 1.1rem;
+  padding: 0.5em;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: $main-dark;
+  color: white;
+}
+
+#header-title {
+  a:hover {
+    color: goldenrod;
+  }
+}
+
+#header-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-flow: row wrap;
+}
+
+#header-search-bar {
+  form {
+    width: 100%;
+    
+    input {
+      font-size: 1em;
+      width: 100%;
+      padding: 0.1em 0.2em;
+    }
+  }
+}

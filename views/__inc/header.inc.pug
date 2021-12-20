@@ -1,0 +1,16 @@
+header
+  .grid-center#header-title
+    a(href="/" class="full-size grid-center text-decoration-none")
+      h1.text-center PIPOT
+  .full-size.grid-center#header-search-bar
+    form(action="/articles/rechercher" method="GET").grid-center
+      input(type="text" name="q" required="" placeholder="Recherchez un article...")
+  #header-nav
+    nav
+      ul.list-style-none
+        if app.user
+          li #[a(href=`/profil/${app.user.username}`) Mon profil]
+          if app.user.role == "ADMIN"
+            li #[a(href="/admin") Espace Admin]
+        else
+          li #[a(href="/auth/connexion") Connexion/Inscription]

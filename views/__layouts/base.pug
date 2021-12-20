@@ -6,27 +6,13 @@ html(lang="en")
     meta(http-equiv="X-UA-Compatible" content="IE=edge")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(href="/img/favicon.png" rel="shortcut icon" type="image/png")
+    link(href="/css/style.min.css" rel="stylesheet")
     script(src="/js/main.js" type="module" defer)
     title #{title} &mdash; Pipot Troc
   body
-    header
-      nav
-        ul
-          li #[a(href="/") Accueil]
-          li #[a(href="/categories") Catégories]
-          if app.user
-            li #[a(href=`/profil/${app.user.username}`)=app.user.username]
-            li #[a(href="/auth/deconnexion") Déconnexion]
-            if app.user.role == "ADMIN"
-              li #[a(href="/admin") Espace Admin]
-          else
-            li #[a(href="/auth/connexion") Connexion/Inscription]
-      div(id="search-bar")
-        form(action="/articles/rechercher" method="GET")
-          input(type="text" name="q" required="" placeholder="Recherchez un article...")
-          input(type="submit" value="Rechercher")
+    include /__inc/header.inc.pug
 
-    main
+    main.p1.flex1
       if flash_success
         p=flash_success
       if flash_errors

@@ -13,15 +13,6 @@ export default class ProductController extends Controller {
     super();
   }
 
-  @get("/:slug")
-  async single(req: Request, res: Response) {
-    const { slug } = req.params;
-    const product = await Product.findOne({ slug });
-    if (!product)
-      return res.redirect("/page-non-trouvee");
-    return res.render("products/single", { product });
-  }
-
   @get("/ajouter")
   async add_GET(req: Request, res: Response): Promise<void> {
     const categories = await Category.findAll();
@@ -73,5 +64,14 @@ export default class ProductController extends Controller {
     return res.render("products/search", {
       products: (products.length) ? products : null
     });
+  }
+
+  @get("/:slug")
+  async single(req: Request, res: Response) {
+    const { slug } = req.params;
+    const product = await Product.findOne({ slug });
+    if (!product)
+      return res.redirect("/page-non-trouvee");
+    return res.render("products/single", { product });
   }
 }
